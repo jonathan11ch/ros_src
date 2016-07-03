@@ -5,6 +5,8 @@
 #include "geometry_msgs/Twist.h"
 #include "tf/transform_datatypes.h"
 
+namespace turtleControl{
+	
 class positionController{
 /*controller parameters*/
 double Gamma;
@@ -40,6 +42,10 @@ double theta;
 		theta=_theta;
 	}				
 };
+
+
+
+}
 
 
 

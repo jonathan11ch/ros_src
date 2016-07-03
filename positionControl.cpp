@@ -65,8 +65,8 @@ int main(int argc, char **argv){
 	/*Loop rate*/
 	ros::Rate loop_rate(150); //150Hz	
 	/*COntroller object*/
-	positionController pc(0.5,0.2);
-	polarCoordinates p();
+	turtleControl::positionController pc(0.5,0.2);
+	turtleControl::polarCoordinates p();
 	/*velocity msgs type */
 	geometry_msgs::Twist velMsg;
 	
