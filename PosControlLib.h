@@ -6,7 +6,7 @@
 #include "tf/transform_datatypes.h"
 
 namespace turtleControl{
-	
+
 class positionController{
 /*controller parameters*/
 double Gamma;
@@ -26,7 +26,9 @@ geometry_msgs::Twist VelCommand;
 		VelCommand.linear.x=Gamma*tanh(e)*cos(alpha);
 		VelCommand.angular.z=k*alpha+Gamma*(tanh(e)/e)*sin(alpha)*cos(alpha);
 		return VelCommand;
-	}		
+	}
+
+
 };
 
 class polarCoordinates{
@@ -40,10 +42,15 @@ double theta;
 		e=_e;
 		alpha=_alpha;
 		theta=_theta;
-	}				
+	}
+	void coorTransf(double _X,double _Y, double XITAc);				
 };
 
-
+void polarCoordinates::coorTransf(double _X, double _Y,double XITAc ){
+	e=sqrt((_X*_X)+(_Y*_Y)); 
+	theta=atan2(_Y,_X);
+	alpha=theta - XITAc;
+}
 
 }
 
