@@ -4,8 +4,23 @@
 #include "nav_msgs/Odometry.h"
 #include "geometry_msgs/Twist.h"
 #include "tf/transform_datatypes.h"
+#include "rosGeometry.h"
 
 namespace turtleControl{
+/**/
+class feedbackError
+{
+double _x;
+double _y;
+public:
+	 feedbackError();
+	~ feedbackError();
+	void calculateError(rosGeometry::coordinate Xd, rosGeometry::coordinate Xc){
+		_x=Xd.getPointX()-Xc.getPointX();
+		_y=Xd.getPointY()-Xc.getPointY();
+	}
+
+};
 
 class positionController{
 /*controller parameters*/
@@ -30,12 +45,14 @@ geometry_msgs::Twist VelCommand;
 
 
 };
-
+/**/
 class polarCoordinates{
+		
+
+	public:	
 double e; 
 double alpha;
-double theta;		
-	public:	
+double theta;
 	polarCoordinates();
 	
 	void setCoordinates(double _e,double _alpha, double _theta){
@@ -43,14 +60,25 @@ double theta;
 		alpha=_alpha;
 		theta=_theta;
 	}
-	void coorTransf(double _X,double _Y, double XITAc);				
+	void coorTransf(double _X,double _Y, double XITAc);
+	void coorTransf(feedbackError fe,double XITAc);				
 };
-
+/* input data ~X calculated as the difference  */
 void polarCoordinates::coorTransf(double _X, double _Y,double XITAc ){
 	e=sqrt((_X*_X)+(_Y*_Y)); 
 	theta=atan2(_Y,_X);
 	alpha=theta - XITAc;
 }
+void polarCoordinates::coorTransf(feedbackError fe,double XITAc){
+	e=sqrt((fe._x*fe._x)+(fe._y*fe._y)); 
+	theta=atan2(fe._y,fe_x);
+	alpha=theta - XITAc;	
+
+}
+
+
+
+
 
 }
 

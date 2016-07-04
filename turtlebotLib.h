@@ -5,28 +5,24 @@
 #include "nav_msgs/Odometry.h"
 #include "geometry_msgs/Twist.h"
 #include "tf/transform_datatypes.h" 
-
+#include "rosGeometry.h"
 /*Robot model main Objects*/
 /*Input values (w,v) angular velocity and linear velocity */
 /*Output values current position*/
 /*Output velocities*/
 namespace turtlebotRos{
 /*Coordinates object class*/
-class rectCoord
+class orientation
 {
-double	x;
-double	y;
+rosGeometry::coordinate _pos;
 double theta;	
 public:
-	rectCoord();
-	~rectCoord();
+	orientation();
+	~orientation();
 	/*setup functions*/
-	void setX(double _x){x=_x;}
-	void setY(double _y){y=_y;}
 	void setTheta(double _theta){theta=_theta;}
 	/*return functions*/	
-	double getX(){return x;}
-	double getY(){return y;}
+	rosGeometry::coordinate getPos(){return _pos;}
 	double getTheta(){return theta;}
 };
 /*Turtlebot object class*/
@@ -36,10 +32,12 @@ std::string velTopic("cmd_vel_mux/input/navi");
 ros::NodeHandle nh;
 ros::Publisher velPub;
 ros::Subscriber OdomSub;
+geometry_msgs::Twist velMsg;
 nav_msgs::Odometry pos_state;
-turtlebotRos::rectCoord _pos;
+turtlebotRos::orientation _pos;
 int queue_size=10;
 bool odomData=false
+
 public:
 	turtlebot(){
 		velPub=nh.advertise<geometry_msgs::Twist>(velTopic,queue_size);
@@ -52,6 +50,8 @@ public:
 	void odomCallback(const nav_msgs::Odometry::ConstPtr& msg);
 	bool odomAvialable();
 	void setOdom(bool b);
+	void Go();
+	turtlebotRos::orientation getPos(){return _pos;}
 };
 
 /**************************FUNCTION DEFINITIONS***************************/
@@ -64,13 +64,16 @@ void turtlebot::setOdom(bool b){
 /*publish the desired velocity on twist topic*/
 	/*input function v, w*/
 void turtlebot::setVelCmd(double v,double w){
-	geometry_msgs::Twist velMsg;
+	velMsg;
 	velMsg.linear.x=v;
 	velMsg.angular.z=w;
-	velPub.publish(velMsg);
 }
 	/*input function Twist compact message*/
-void turtlebot::setVelCmd(geometry_msgs::Twist velMsg){
+void turtlebot::setVelCmd(geometry_msgs::Twist vel){
+	velMsg=vel;
+}
+
+void turtlebot::Go(){
 	velPub.publish(velMsg);
 }
 /*set buffer size for velocity topic*/
@@ -79,8 +82,8 @@ void turtlebot::setVelQueue(int q){
 }
 /*callback function for Odometry updates the odometry state*/
 void turtlebot::odomCallback(const nav_msgs::Odometry::ConstPtr& msg){
-	_pos.setX(msg->pose.pose.position.x);  //x position
-	_pos.setY(msg->pose.pose.position.y);  //y position
+	odomData=true;
+	_pos.getPos().setValues(msg->pose.pose.position.x,msg->pose.pose.position.y);  //x position  //y position
 	_pos.setTheta(tf::getYaw(msg->pose.pose.orientation)); //orientation angle YAW
 }
 
